@@ -11,8 +11,13 @@
  * @param formReference - String - elementId or elementClass
  * @returns {Promise<any>}
  */
-const yii2AjaxRequest = (formReference)  =>
+const yii2AjaxRequest = (formReference,configs)  =>
 {
+  if(!(configs) || !(configs instanceof Object)){
+    const configs = {
+      resetForm: true
+    };
+  }
 
   if(formReference && $(formReference).length){
 
@@ -31,6 +36,11 @@ const yii2AjaxRequest = (formReference)  =>
             dataType: 'json',
             data: formData,
             complete: function (data) {
+
+              if(configs.resetForm){
+                form.trigger("reset");
+              }
+
               resolv({
                 data:data.responseJSON,
                 status:data.status
