@@ -6,6 +6,7 @@
  * GitHub: github.com/ronysilvati
  */
 
+
 /**
  *
  * @param formReference - String - elementId or elementClass
@@ -24,11 +25,13 @@ const yii2AjaxRequest = (formReference,configs)  =>
     return new Promise((resolv,reject)  => {
 
       $(formReference).on('beforeSubmit', function(e) {
+        const self = $(this);
+        const referenceButtonSubmit = 'button[type=submit]';
 
         try{
           var form = $(this);
-
           var formData = form.serialize();
+          $(referenceButtonSubmit,self).prop('disabled',true);
 
           $.ajax({
             url: form.attr('action'),
@@ -36,6 +39,7 @@ const yii2AjaxRequest = (formReference,configs)  =>
             dataType: 'json',
             data: formData,
             complete: function (data) {
+              $(referenceButtonSubmit,self).prop('disabled',false);
 
               if(configs.resetForm){
                 form.trigger("reset");
@@ -50,6 +54,7 @@ const yii2AjaxRequest = (formReference,configs)  =>
         }
         catch(err){
           console.log("yii2AjaxRequest:", err);
+          $(referenceButtonSubmit,self).prop('disabled',false);
           reject(err);
         }
 
@@ -66,4 +71,6 @@ const yii2AjaxRequest = (formReference,configs)  =>
     throw ("The reference to form element is invalid!");
   }
 }
+
+
 
