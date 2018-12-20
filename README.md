@@ -45,6 +45,13 @@ Allow send and receive data in a request prepared with yii2 ajax request
   ``` es6
     const configs = {resetForm:true};
   ```
+  
+  To add a message into button submit when the request is processed, add this key in
+  your object config:
+  ``` es6
+      const configs = {messageLoading:'Loading'};
+  ```
+    
   ### Response
   
   The object "success" return this content:
