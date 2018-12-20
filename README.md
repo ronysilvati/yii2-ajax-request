@@ -25,18 +25,26 @@ Allow send and receive data in a request prepared with yii2 ajax request
   
   ``` es6
   <script>
-    yii2AjaxRequest('#my-form') // The id or class of your form
-      .then((success) => { // The responde of request. 
+    //#my-form => The id or class of your form
+    //const configs = {}; // A object of configs 
+    yii2AjaxRequest('#my-form',configs,
+        (success)   =>  {// The responde of request.
         
-      })
-      .catch((err)  => { // The return of a block try / catch
-      
-      });
+        },
+        (error) =>  {// The return of a block try / catch
+        
+        });
   </script>
   ```
   
   When your form as submited, the request is sended by ajax.
   
+  ### Configs
+  Case you need clear the form when finished request, add this key in your
+  object config:
+  ``` es6
+    const configs = {resetForm:true};
+  ```
   ### Response
   
   The object "success" return this content:

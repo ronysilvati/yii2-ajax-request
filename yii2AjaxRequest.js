@@ -6,13 +6,15 @@
  * GitHub: github.com/ronysilvati
  */
 
-
 /**
  *
  * @param formReference - String - elementId or elementClass
- * @returns {Promise<any>}
+ * @param configs - Object - Object with configs
+ * @param callbackSuccess - Function - function to be called when complete the request
+ * @param callbackError - Function - function to be called if as a crash.
+ *
  */
-const yii2AjaxRequest = (formReference,configs)  =>
+const yii2AjaxRequest = (formReference,configs,callbackSuccess,callbackError)  =>
 {
   if(!(configs) || !(configs instanceof Object)){
     const configs = {
@@ -22,48 +24,50 @@ const yii2AjaxRequest = (formReference,configs)  =>
 
   if(formReference && $(formReference).length){
 
-    return new Promise((resolv,reject)  => {
+    $(formReference).on('beforeSubmit', function(e) {
+      const self = $(this);
+      const referenceButtonSubmit = 'button[type=submit]';
 
-      $(formReference).on('beforeSubmit', function(e) {
-        const self = $(this);
-        const referenceButtonSubmit = 'button[type=submit]';
+      try{
+        var form = $(this);
+        var formData = form.serialize();
+        $(referenceButtonSubmit,self).prop('disabled',true);
 
-        try{
-          var form = $(this);
-          var formData = form.serialize();
-          $(referenceButtonSubmit,self).prop('disabled',true);
+        $.ajax({
+          url: form.attr('action'),
+          type: form.attr('method'),
+          dataType: 'json',
+          data: formData,
+          complete: function (data) {
+            $(referenceButtonSubmit,self).prop('disabled',false);
 
-          $.ajax({
-            url: form.attr('action'),
-            type: form.attr('method'),
-            dataType: 'json',
-            data: formData,
-            complete: function (data) {
-              $(referenceButtonSubmit,self).prop('disabled',false);
+            if(configs.resetForm){
+              form.trigger("reset");
+            }
 
-              if(configs.resetForm){
-                form.trigger("reset");
-              }
-
-              resolv({
+            if(typeof callbackSuccess === 'function'){
+              callbackSuccess({
                 data:data.responseJSON,
                 status:data.status
-              })
-            },
-          });
+              });
+            }
+          },
+        });
+      }
+      catch(err){
+        console.log("yii2AjaxRequest:", err);
+        $(referenceButtonSubmit,self).prop('disabled',false);
+
+        if(typeof callbackError === 'function'){
+          callbackError(err);
         }
-        catch(err){
-          console.log("yii2AjaxRequest:", err);
-          $(referenceButtonSubmit,self).prop('disabled',false);
-          reject(err);
-        }
 
-        e.preventDefault();
+      }
 
-      }).on('submit', function(e){
-        e.preventDefault();
-      });
+      e.preventDefault();
 
+    }).on('submit', function(e){
+      e.preventDefault();
     });
 
   }
@@ -71,6 +75,4 @@ const yii2AjaxRequest = (formReference,configs)  =>
     throw ("The reference to form element is invalid!");
   }
 }
-
-
 
